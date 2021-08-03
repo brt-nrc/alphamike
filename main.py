@@ -17,7 +17,7 @@ tic2 = time.perf_counter()
 missing_barcodes = {}               # missing barcodes for debug purposes
 for structure in structures:
     try:
-        e = structure.run_mustang()
+        e = structure.run_mustang(mustang_path='MUSTANG_v3.2.3/bin/')
     except Exception as err:
         print(err)
         missing_barcodes[structure.barcode] = err

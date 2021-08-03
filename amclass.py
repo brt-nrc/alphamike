@@ -84,7 +84,7 @@ class Structure:
             for e in pdbfiles:
                 print('+', e, sep='', file=desc)            # prints the domain list
 
-    def run_mustang(self, filename: str = 'results') -> None:
+    def run_mustang(self, filename: str = 'results', mustang_path: 'path' = '') -> None:
         """Runs MUSTANG and saves the identities result"""
         results_filename = filename + '.csv'                    # results filename
         check_make_dir('results')                               # checks if the folder path exists
@@ -92,7 +92,7 @@ class Structure:
         if not os.path.isfile(out):
             path = os.path.join('results', self.barcode)        # creates output path
             self.create_descriptor()                            # creates descriptor file
-            command = ['MUSTANG_v3.2.3/bin/mustang-3.2.3', '-o', path, '-f', 'desc_tmp', '-s', 'OFF']   # MUSTANG command
+            command = [mustang_path + 'mustang-3.2.3', '-o', path, '-f', 'desc_tmp', '-s', 'OFF']   # MUSTANG command
             print(command)                                      # ****** DEBUG ********
             try:
                 run(command, check=True)                        # runs the command and checks if the program completes succesfully
