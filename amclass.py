@@ -45,6 +45,7 @@ class Structure:
                     for line_content in file:                                   # for each line
                         line = line_content.split()                             # creates a list from string
                         if line[0] == name[0:5]:                                # checks if the line describes the domain requested
+                            found = True
                             index_sum = 3                                       # initializes index_sum at 3. line[index_sum] = n. of fragments in 1st chain
                             if not int(name[-2:]) == 0:                         # if the last 2 chars of domain is different from 00, we need to find the correct chain description
                                 for i in range(int(name[-2:])-1):               # loop for "XX"-1
@@ -56,8 +57,10 @@ class Structure:
                                 domain_boundaries = [int(e) for e in domain_boundaries[::2]]    #
                             elif name[4].isalpha():                             # if chain char is a letter
                                 domain_boundaries = [int(e) for e in line[index_sum:index_max] if not (e == '-' or e.isalpha())] # creates new list with [0]->n. of fragments and then fragment boundaries
-                            for i in range(domain_boundaries[0]):               # loop for the n. of fragments
-                                domain_range.extend(range(domain_boundaries[1 + i * 2], domain_boundaries[2 + i * 2]+1))    # creates new list with all the pdb numbers included in the chain
+                            if found:
+                                break
+                    for i in range(domain_boundaries[0]):               # loop for the n. of fragments
+                        domain_range.extend(range(domain_boundaries[1 + i * 2], domain_boundaries[2 + i * 2]+1))    # creates new list with all the pdb numbers included in the chain
                     with open(pdb_main) as pdbfile:                             # open the source file
                         try:
                             with open(pdb_domain_path, "w") as domainfile:      # open the domain file
