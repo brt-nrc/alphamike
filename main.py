@@ -22,7 +22,5 @@ for structure in structures:
         print(err)
         missing_barcodes[structure.barcode] = err
 toc2 = time.perf_counter()
-print(f"Domains in {toc1-tic1:0.4f} seconds")
-print(f"Mustang in {toc2-tic2:0.4f} seconds")
 print("Missing results: ", len(missing_barcodes))
 pprint(missing_barcodes)

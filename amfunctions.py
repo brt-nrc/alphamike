@@ -64,7 +64,7 @@ def initialize_csv(name: 'str' = 'results') -> None:
     filename = name + '.csv'
     try:                                                                        # Creates filename
         with open(filename, 'w') as csv:                                        # Opens file
-            titles = ['Barcode', 'Identities', 'Length', 'Percentage']          # Headers
+            titles = ['Barcode', 'Identities', 'Length', 'Percentage', 'Notes']          # Headers
             titles_escaped = [t.strip("'[]") for t in titles]
             print(titles_escaped, sep=',', file=csv)                            # Writes comma-separated headers to file
     except Exception as err:

@@ -76,11 +76,14 @@ class Structure:
                         except Exception as err:
                             raise FileError("domain file error", err)
 
-    def create_descriptor(self, out: 'path' = 'desc_tmp', folder_path: 'path' = 'pdb/'):
+    def create_descriptor(self, out: str = 'desc_tmp', pdb_path: 'path' = 'pdb/', folder_path: 'path' = ''):
         """Creates descriptor file as MUSTANG's spec"""
         pdbfiles = [e + '.pdb' for e in self.domain_list]   # Creates new list with filenames + extension of domains
-        with open(out, 'w') as desc:                        # Opens descriptor file
-            print('>', folder_path, file=desc, sep='')      # prints the path to domains
+        check_make_dir(folder_path)
+        path = os.path.abspath(folder_path)
+        out_path = os.path.join(path, out)
+        with open(out_path, 'w') as desc:                   # Opens descriptor file
+            print('>', pdb_path, file=desc, sep='')         # prints the path to domains
             for e in pdbfiles:
                 print('+', e, sep='', file=desc)            # prints the domain list
 
@@ -97,6 +100,7 @@ class Structure:
             try:
                 run(command, check=True)                        # runs the command and checks if the program completes succesfully
             except Exception as err:
+                self.create_descriptor(out=self.barcode, folder_path='missing')
                 raise Exception(err)
         try:
             with open(out) as mus_result:                       # opens the result file
@@ -110,7 +114,7 @@ class Structure:
                             with open(results_filename, 'a') as results:
                                 string_mus = mus_result_line.replace('#', '').replace('<B>', ' ').replace('</B>', ' ') # remove unwanted chars from the string
                                 list_mus = string_mus.split()
-                                print(self.barcode, list_mus[1],  list_mus[3], list_mus[5], sep=',', file=results)      # save identity data to csv
+                                print(self.barcode, list_mus[1],  list_mus[3], list_mus[5], '', sep=',', file=results)      # save identity data to csv
         except Exception as err:
             raise Exception(err)
 
