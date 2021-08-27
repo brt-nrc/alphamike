@@ -1,7 +1,7 @@
 from amfunctions import check_make_dir, download_list_ftp, InputError, FileError, download_pdb, initialize_csv
 import os
 from subprocess import run
-
+import csv
 
 class Structure:
     """Structure class.
@@ -115,9 +115,11 @@ class Structure:
                             if not os.path.exists(results_filename): # if the result csv exists
                                 initialize_csv(filename)        # if it doesnt, initialize it
                             with open(results_filename, 'a') as results:
+                                writer = csv.writer(results)
                                 string_mus = mus_result_line.replace('#', '').replace('<B>', ' ').replace('</B>', ' ') # remove unwanted chars from the string
                                 list_mus = string_mus.split()
-                                print(self.barcode, list_mus[1],  list_mus[3], list_mus[5], '', sep=',', file=results)      # save identity data to csv
+                                row = [self.barcode, list_mus[1],  list_mus[3], list_mus[5], '']
+                                writer.writerow(row)     # save identity data to csv
         except Exception as err:
             raise Exception(err)
 
