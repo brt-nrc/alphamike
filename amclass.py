@@ -1,18 +1,22 @@
 from amfunctions import check_make_dir, download_list_ftp, InputError, FileError, download_pdb, initialize_csv
 import os
-from subprocess import run
+import subprocess
 import csv
 
 class Structure:
     """Structure class.
     Attributes: barcode - string
                 domain_list - list(string)
+                family_set - set(string)
+                num_family - int
     Methods: check_create_domain(folder_path = pdb)
              create_descriptor(out = desc_tmp, folder_path = pdb/)
              run_mustang(folder_path = pdb)"""
-    def __init__(self, b: str, d: list) -> None:                                # Creates Object
+    def __init__(self, b: str, d: list, f: set) -> None:                        # Creates Object
         self.barcode = b
         self.domain_list = d.copy()
+        self.family_set = f.copy()
+        self.num_family = len(self.family_set)
 
     def __repr__(self):
         return "{0} -> {1}".format(self.barcode, self.domain_list)              # print() method
@@ -30,7 +34,7 @@ class Structure:
             pdb_domain_file = name + pdb_ext                                    # filename of the requested domain
             pdb_domain_path = os.path.join(path, pdb_domain_file)               # path of the requested domain
             if not os.path.isfile(pdb_domain_path):                             # if file exists, skip creation
-                print('**** DEBUG Making ', name, ' domain')
+                print('Making ', name, ' domain', end='', flush=True)
                 domain_range = []                                               # domain range list initialization
                 domain_boundaries = []                                          # domain boundaries list initialization
                 pdb_main_path = os.path.join(path, 'source')                    # creates path of .pdb sources
@@ -99,9 +103,9 @@ class Structure:
             path = os.path.join('results', self.barcode)        # creates output path
             self.create_descriptor()                            # creates descriptor file
             command = [mustang_path + 'mustang-3.2.3', '-o', path, '-f', 'desc_tmp', '-s', 'OFF']   # MUSTANG command
-            print(command)                                      # ****** DEBUG ********
             try:
-                run(command, check=True)                        # runs the command and checks if the program completes succesfully
+                subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)   # runs the command and checks if the program completes succesfully
+
             except Exception as err:
                 self.create_descriptor(out=self.barcode, folder_path='missing')
                 raise Exception(err)
@@ -118,7 +122,7 @@ class Structure:
                                 writer = csv.writer(results)
                                 string_mus = mus_result_line.replace('#', '').replace('<B>', ' ').replace('</B>', ' ') # remove unwanted chars from the string
                                 list_mus = string_mus.split()
-                                row = [self.barcode, list_mus[1],  list_mus[3], list_mus[5], '']
+                                row = [self.barcode, list_mus[1], list_mus[3], list_mus[5], self.num_family, '']
                                 writer.writerow(row)     # save identity data to csv
         except Exception as err:
             raise Exception(err)
@@ -134,8 +138,11 @@ def find_structures(file: 'path' = 'chwgo.txt') -> list:
             if num > 1:                     # if the number is more than 1, save the structure
                 barcode = line_content[1]   # save barcode
                 domain_list = []            # initializes domain list
+                family_set = set()         # initializes family set
                 for i in range(num):        # for number of domains linked
-                    domain = line_content[2+3*i]    # save domains, skip unwanted data
+                    index = 2+3*i           # index for accessing domain and family data
+                    domain = line_content[index]    # save domains
                     domain_list.append(domain.replace(',', '')) # append domain do domain list, removes ,
-                structure_list.append(Structure(barcode, domain_list))  # append to output the new structure
+                    family_set.add(line_content[index+1]) # save domain
+                structure_list.append(Structure(barcode, domain_list, family_set))  # append to output the new structure
     return structure_list

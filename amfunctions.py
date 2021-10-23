@@ -2,6 +2,7 @@ from ftplib import FTP
 import os
 import requests
 import csv
+from datetime import datetime
 
 class FolderCreationError(Exception):
     pass
@@ -41,7 +42,6 @@ def check_make_dir(path: 'path') -> None:
 
 def download_pdb(name: str, folder_path: 'path' = 'pdb') -> None:
     """Downloads .pdb files from rcsb.org"""
-    print("****DEBUG: download_pdb", name, sep='\t')
     baseurl = 'https://files.rcsb.org/download/'                                # Downloading files from rcsb.org
     abspath_tmp = os.path.abspath(folder_path)                                  # Create absolute path of folder_path
     check_make_dir(abspath_tmp)                                                 # Calls check_make_dir
@@ -64,8 +64,14 @@ def initialize_csv(name: 'str' = 'results') -> None:
     filename = name + '.csv'
     try:                                                                        # Creates filename
         with open(filename, 'w') as file:                                        # Opens file
-            titles = ['Barcode', 'Identities', 'Length', 'Percentage', 'Notes']          # Headers
+            titles = ['Barcode', 'Identities', 'Length', 'Percentage', '#Family', 'Notes']          # Headers
             writer = csv.writer(file)
             writer.writerow(titles)                              # Writes comma-separated headers to file
     except Exception as err:
         raise Exception(err)
+
+
+def error_log(item) -> None:
+    """Logs item to log"""
+    with open("error.log", "a") as log:
+        print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "\t", item, file=log)
