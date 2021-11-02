@@ -3,8 +3,8 @@ import os
 import subprocess
 import csv
 
-class Structure:
-    """Structure class.
+class Family:
+    """Family class.
     Attributes: barcode - string
                 domain_list - list(string)
                 family_set - set(string)
@@ -144,5 +144,5 @@ def find_structures(file: 'path' = 'chwgo.txt') -> list:
                     domain = line_content[index]    # save domains
                     domain_list.append(domain.replace(',', '')) # append domain do domain list, removes ,
                     family_set.add(line_content[index+1]) # save domain
-                structure_list.append(Structure(barcode, domain_list, family_set))  # append to output the new structure
+                structure_list.append(Family(barcode, domain_list, family_set))  # append to output the new structure
     return structure_list
