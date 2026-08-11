@@ -1,14 +1,17 @@
-MUSTANG_v3.2.3/
-pdb/
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
 results/
-results*
-files/prova.py
-cath-domain-boundaries*
-chwgo.txt
-files/desc
-desc_tmp
-files/
-*.html
-0*
-missing/
-error.log
+pdb/
+.idea/
+MUSTANG_v3.2.3/
+
+.env
