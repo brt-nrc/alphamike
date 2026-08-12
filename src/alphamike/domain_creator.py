@@ -57,9 +57,10 @@ def create_domain(domain: str, folder_path: Path = Path('pdb')) -> Path:
                 if line[0] == domain_protein:
                     index_sum = 3
                     if not int(domain_number_in_chain) == 0: 
+                        # Skip the number of segments of previous domains:
                         for i in range(int(domain_number_in_chain)-1):
-                            d = int(line[index_sum])
-                            index_sum += d * 6 + 1
+                            d = int(line[index_sum]) # number of segments of previous domain
+                            index_sum += d * 6 + 1 # Skip the previous domains
                     index_max = index_sum + int(line[index_sum])*6
                     if domain_protein_chain.isdigit():
                         domain_boundaries = [e for e in line[index_sum:index_max] if not e == '-' or e.isalpha()]
