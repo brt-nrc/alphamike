@@ -1,6 +1,7 @@
+import csv
 import logging
-from pathlib import Path
 import tempfile
+from pathlib import Path
 from subprocess import run
 from alphamike.structure import Structure
 from alphamike.utils import initialize_csv
@@ -9,7 +10,6 @@ from alphamike.settings import settings
 logger: logging.Logger = logging.getLogger(__name__)
 
 def run_mustang(structure: Structure, result_folder: Path = Path('results'), aggregate_result_file: Path = Path('aggregate_results.csv')) -> None:
-    results_filename: Path = aggregate_result_file
     result_folder.mkdir(exist_ok=True)
     out: Path = result_folder / (structure.barcode+'.html')
     if not out.is_file():
@@ -21,23 +21,20 @@ def run_mustang(structure: Structure, result_folder: Path = Path('results'), agg
             logger.debug(command)
         try:
             run(command, check=True)
-        except Exception:
-            raise
         finally:
             if desc_tmp_path.is_file():
                 desc_tmp_path.unlink()
         try:
             with open(out) as mus_result:
                 for mus_result_line in mus_result:
-                    mus = mus_result_line.split()
-                    iden = 'Identity:'
+                    mus: list[str] = mus_result_line.split()
                     if len(mus) > 1:
-                        if iden in mus[1]:
-                            if not results_filename.is_file():
+                        if 'Identity:' in mus[1]:
+                            if not aggregate_result_file.is_file():
                                 initialize_csv(aggregate_result_file)
-                            with open(results_filename, 'a') as results:
-                                string_mus = mus_result_line.replace('#', '').replace('<B>', ' ').replace('</B>', ' ')
-                                list_mus = string_mus.split()
-                                print(structure.barcode, list_mus[1],  list_mus[3], list_mus[5], sep=',', file=results)
+                            with open(aggregate_result_file, 'a', newline='') as results:
+                                string_mus: str = mus_result_line.replace('#', '').replace('<B>', ' ').replace('</B>', ' ')
+                                list_mus: list[str] = string_mus.split()
+                                csv.writer(results).writerow([structure.barcode, list_mus[1], list_mus[3], list_mus[5]])
         except Exception as err:
-            raise Exception(err)
+            raise RuntimeError("Failed to parse Mustang output") from err
